@@ -1,0 +1,1 @@
+this is a folder for a thin proxy, relaying gemini enterprise's A2A Oauth mechanism to Elastic API Key based A2A. Make sure this project is as small as possible and able to be deployed with only 1 script
