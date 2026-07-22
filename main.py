@@ -15,6 +15,7 @@ instead. Config via env vars:
 
 import json
 import os
+import re
 import sys
 import urllib.error
 import urllib.request
@@ -79,7 +80,11 @@ class Handler(BaseHTTPRequestHandler):
             headers={"Authorization": f"ApiKey {ELASTIC_API_KEY}"},
         )
         with urllib.request.urlopen(req) as resp:
-            return json.loads(resp.read())
+            raw = resp.read().decode("utf-8")
+        # Elastic's agent card uses triple-quoted strings for multi-line
+        # description fields, which isn't valid JSON — repair before parsing.
+        fixed = re.sub(r'"""(.*?)"""', lambda m: json.dumps(m.group(1)), raw, flags=re.DOTALL)
+        return json.loads(fixed)
 
     def _proxy_to_elastic(self):
         body = self._drain_body()
