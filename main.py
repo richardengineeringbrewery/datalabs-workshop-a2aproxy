@@ -24,7 +24,7 @@ import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-GOOGLE_AUTHORIZATION_URL = "https://accounts.google.com/o/oauth2/v2/auth"
+GOOGLE_AUTHORIZATION_URL = "https://accounts.google.com/o/oauth2/v2/auth?access_type=offline"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 
 PORT = int(os.environ.get("PORT", "8080"))
