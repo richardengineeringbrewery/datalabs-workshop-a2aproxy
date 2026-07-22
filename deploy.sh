@@ -39,7 +39,16 @@ fi
 AGENT_CARD_FILE="${AGENT_CARD_FILE:-agent-card.json}"
 
 if [[ -f "${AGENT_CARD_FILE}" ]]; then
-  ELASTIC_A2A_URL="$("${PYTHON_BIN}" -c "import json; print(json.load(open('${AGENT_CARD_FILE}'))['url'])")"
+  # Elastic's raw agent card export uses triple-quoted strings for multi-line
+  # description fields, which isn't valid JSON — repair before parsing.
+  ELASTIC_A2A_URL="$("${PYTHON_BIN}" - "${AGENT_CARD_FILE}" <<'PYEOF'
+import json, re, sys
+
+raw = open(sys.argv[1], encoding="utf-8").read()
+fixed = re.sub(r'"""(.*?)"""', lambda m: json.dumps(m.group(1)), raw, flags=re.DOTALL)
+print(json.loads(fixed)["url"])
+PYEOF
+)"
   ELASTIC_AGENT_CARD_URL="${ELASTIC_A2A_URL}/.well-known/agent-card.json"
 else
   ELASTIC_A2A_URL="${ELASTIC_A2A_URL:-CHANGE_ME_ELASTIC_A2A_URL}"
@@ -97,3 +106,10 @@ gcloud run deploy "${SERVICE_NAME}" \
   --project "${PROJECT_ID}" \
   --allow-unauthenticated \
   --set-env-vars "${ENV_VARS}"
+
+SERVICE_URL="$(gcloud run services describe "${SERVICE_NAME}" \
+  --region "${REGION}" \
+  --project "${PROJECT_ID}" \
+  --format="value(status.url)")"
+
+echo "Agent card URL for Gemini Enterprise: ${SERVICE_URL}/.well-known/agent-card.json"
