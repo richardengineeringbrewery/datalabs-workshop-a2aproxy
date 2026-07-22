@@ -88,9 +88,15 @@ if [[ -n "${REDIRECT_URI:-}" ]]; then
     gcloud alpha iap oauth-clients create "${BRAND}" \
       --display_name="${OAUTH_CLIENT_DISPLAY_NAME}" \
       --redirect_uris="${REDIRECT_URI}"
+    EXISTING_CLIENT="$(gcloud alpha iap oauth-clients list "${BRAND}" \
+      --filter="displayName=${OAUTH_CLIENT_DISPLAY_NAME}" \
+      --format="value(name)" | head -1)"
   else
     echo "OAuth client already exists: ${EXISTING_CLIENT} (skipping creation, not re-printing secret)"
   fi
+
+  CLIENT_ID="${EXISTING_CLIENT##*/}"
+  echo "Authorization URL (prefilled client_id): https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&prompt=consent&access_type=offline"
 fi
 
 ENV_VARS="ELASTIC_A2A_URL=${ELASTIC_A2A_URL},ELASTIC_API_KEY=${ELASTIC_API_KEY}"
