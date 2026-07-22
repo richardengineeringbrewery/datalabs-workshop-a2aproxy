@@ -1,0 +1,50 @@
+{
+  "name": "Example Agent",
+  "description": "Template only. Replace this whole file's contents with the real agent card fetched from your Elastic instance (GET <a2a-url>/.well-known/agent-card.json with your API key), and save it as agent-card.json next to deploy.sh.",
+  "url": "https://your-elastic-instance.kb.<region>.gcp.elastic.cloud/api/agent_builder/a2a/<your-agent-id>",
+  "provider": {
+    "organization": "Elastic",
+    "url": "https://elastic.co"
+  },
+  "version": "0.1.0",
+  "protocolVersion": "0.3.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": false
+  },
+  "securitySchemes": {
+    "authorization": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Authentication token"
+    }
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "example.tool",
+      "name": "example.tool",
+      "description": "Example skill entry. Your real card will list Elastic Agent Builder's actual tools here.",
+      "tags": [
+        "tool"
+      ],
+      "examples": [],
+      "inputModes": [
+        "text/plain",
+        "application/json"
+      ],
+      "outputModes": [
+        "text/plain",
+        "application/json"
+      ]
+    }
+  ],
+  "supportsAuthenticatedExtendedCard": false
+}
