@@ -10,9 +10,10 @@
 ELASTIC_API_KEY="CHANGE_ME_ELASTIC_API_KEY"
 # ---------------------
 
-# The Elastic A2A URL is read automatically from agent-card.json (fetched from
-# <a2a-url>/.well-known/agent-card.json) placed next to this script — no need
-# to set it here.
+# The Elastic A2A URL is read automatically from agent-card.json (copy the
+# card JSON from Elastic's Agent Builder UI into this file next to this
+# script) — no need to set it here. The file is also bundled into the
+# deployed container so the proxy can serve it as the agent card.
 #
 # First run only, to also create (or reuse) the Google OAuth consent screen
 # ("brand") and Web application OAuth client that Gemini Enterprise
@@ -40,7 +41,7 @@ fi
 
 AGENT_CARD_FILE="${AGENT_CARD_FILE:-agent-card.json}"
 if [[ ! -f "${AGENT_CARD_FILE}" ]]; then
-  echo "Missing ${AGENT_CARD_FILE}. Fetch it from <elastic-a2a-url>/.well-known/agent-card.json and save it here (see agent-card.example.json)." >&2
+  echo "Missing ${AGENT_CARD_FILE}. Copy the agent card JSON from Elastic's Agent Builder UI and save it here (see agent-card.example.json)." >&2
   exit 1
 fi
 
@@ -54,7 +55,6 @@ fixed = re.sub(r'"""(.*?)"""', lambda m: json.dumps(m.group(1)), raw, flags=re.D
 print(json.loads(fixed)["url"])
 PYEOF
 )"
-ELASTIC_AGENT_CARD_URL="${ELASTIC_A2A_URL}/.well-known/agent-card.json"
 
 if [[ "${ELASTIC_API_KEY}" == "CHANGE_ME_ELASTIC_API_KEY" ]]; then
   echo "Set ELASTIC_API_KEY at the top of deploy.sh." >&2
@@ -93,7 +93,7 @@ if [[ -n "${REDIRECT_URI:-}" ]]; then
   fi
 fi
 
-ENV_VARS="ELASTIC_A2A_URL=${ELASTIC_A2A_URL},ELASTIC_API_KEY=${ELASTIC_API_KEY},ELASTIC_AGENT_CARD_URL=${ELASTIC_AGENT_CARD_URL}"
+ENV_VARS="ELASTIC_A2A_URL=${ELASTIC_A2A_URL},ELASTIC_API_KEY=${ELASTIC_API_KEY}"
 
 gcloud run deploy "${SERVICE_NAME}" \
   --source . \
